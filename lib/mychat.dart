@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:focus_detector/focus_detector.dart';
-import 'package:mychat/chat.dart';
 import 'package:mychat/contact.dart';
 import 'package:mychat/listechat.dart';
 import 'package:mychat/setting.dart';
@@ -17,12 +16,13 @@ class MyChat extends StatefulWidget {
 class _MyChatState extends State<MyChat> {
   int _selectedIndex = 0;
   String? _userDisplayName;
-  String? _userEmail; // Nouvelle variable pour stocker l'email de l'utilisateur
+  String? _userEmail;
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    Listchat(),
+  static List<Widget> _widgetOptions = <Widget>[
+    Listechat(),
     Contact(),
-    Text('Person Page'),
+    Text("en développement, patience... "),
+    Text("en développement, patience... "),
     Setting(),
   ];
 
@@ -50,7 +50,7 @@ class _MyChatState extends State<MyChat> {
     } else {
       setState(() {
         _userDisplayName = userDoc['displayName'];
-        _userEmail = user.email; // Stocker l'email de l'utilisateur
+        _userEmail = user.email;
       });
     }
   }
@@ -68,6 +68,11 @@ class _MyChatState extends State<MyChat> {
             title: Text('Entrer votre nom d\'utilisateur'),
             content: TextField(
               onChanged: (value) => input = value,
+              decoration: InputDecoration(
+                hintText: 'Nom d\'utilisateur',
+                counterText: '', // Masque le texte du compteur
+              ),
+              maxLength: 15, // Limite le nombre de caractères
             ),
             actions: [
               TextButton(
@@ -85,25 +90,26 @@ class _MyChatState extends State<MyChat> {
         isUsernameTaken = await _isUsernameTaken(displayName);
         if (isUsernameTaken) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("nom d'utilisateur déjà utilisé")),
+            SnackBar(content: Text("Nom d'utilisateur déjà utilisé")),
           );
         }
       } else {
-        isUsernameTaken =
-            false; // Sortir de la boucle si l'utilisateur n'a pas entré de nom d'utilisateur
+        isUsernameTaken = false;
       }
     }
 
     if (displayName != null && displayName.isNotEmpty) {
       User? user = FirebaseAuth.instance.currentUser;
-      await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
-        'displayName': displayName,
-        'email': user.email // Stocker l'email de l'utilisateur
-      }, SetOptions(merge: true));
-      setState(() {
-        _userDisplayName = displayName;
-        _userEmail = user.email; // Stocker l'email de l'utilisateur
-      });
+      if (user != null) {
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'displayName': displayName,
+          'email': user.email,
+        }, SetOptions(merge: true));
+        setState(() {
+          _userDisplayName = displayName;
+          _userEmail = user.email; // Met à jour _userEmail avec l'email actuel
+        });
+      }
     } else {
       print(FirebaseAuth.instance.currentUser?.uid);
     }
@@ -132,38 +138,51 @@ class _MyChatState extends State<MyChat> {
         _checkUserAndUsername();
       },
       child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight + 5),
+          child: AppBar(
+            titleSpacing: 0,
+            backgroundColor: Colors.grey.shade300,
+            title: Row(
+              children: [
+                Text(
+                  "Bienvenue dans ton Chat",
+                  style: TextStyle(fontSize: 18, color: Colors.black),
+                ),
+                if (_userDisplayName != null) ...[
+                  SizedBox(width: 5),
+                  Container(
+                    width: 100, // Limite la largeur du conteneur
+                    child: Text(
+                      _userDisplayName!,
+                      style: TextStyle(fontSize: 18, color: Colors.black),
+                      overflow:
+                          TextOverflow.ellipsis, // Gère le débordement du texte
+                    ),
+                  ),
+                ],
+                Text(
+                  " !",
+                  style: TextStyle(fontSize: 18, color: Colors.black),
+                ),
+              ],
+            ),
+            actions: [
+              CircleAvatar(
+                backgroundColor: Colors.black,
+                child: Icon(
+                  Icons.account_circle,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(width: 10),
+            ],
+          ),
+        ),
         body: Container(
           padding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
           child: Column(
             children: [
-              Row(
-                children: [
-                  const Text(
-                    "Bienvenue dans ton Chat ",
-                    style: TextStyle(fontSize: 24),
-                  ),
-                  if (_userDisplayName != null) SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _userDisplayName ?? 'User',
-                        style: TextStyle(fontSize: 24),
-                      ),
-                      if (_userEmail != null)
-                        Text(
-                          _userEmail!,
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(width: 10),
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundImage: AssetImage("assets/images/pdp.jpeg"),
-                  ),
-                ],
-              ),
               Expanded(
                 child: Center(
                   child: _widgetOptions.elementAt(_selectedIndex),
@@ -185,15 +204,17 @@ class _MyChatState extends State<MyChat> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.group),
-              label: "Contact",
+              label: "Contacts",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.call),
-              label: "Calls",
+              label: "Appels",
             ),
             BottomNavigationBarItem(
+                icon: Icon(Icons.notifications), label: "Notifications"),
+            BottomNavigationBarItem(
               icon: Icon(Icons.settings),
-              label: "Settings",
+              label: "Paramètres",
             ),
           ],
         ),

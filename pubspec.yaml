@@ -1,7 +1,7 @@
 name: mychat
-description: "A new Flutter project."
+description: "Ton chat"
 # The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
+# pub.dev using flutter pub publish. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
@@ -23,10 +23,10 @@ environment:
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
-# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# consider running flutter pub upgrade --major-versions. Alternatively,
 # dependencies can be manually updated by changing the version numbers below to
 # the latest version available on pub.dev. To see which dependencies have newer
-# versions available, run `flutter pub outdated`.
+# versions available, run flutter pub outdated.
 dependencies:
   flutter:
     sdk: flutter
@@ -41,19 +41,39 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   
     
-  firebase_auth: ^4.0.0
-  cloud_firestore: ^4.0.0
-  firebase_storage: ^11.0.0
-  image_picker: ^0.8.5+3
+  firebase_auth: ^5.1.0
+  cloud_firestore: ^5.0.1
+  firebase_storage: ^12.0.1
+  image_picker: ^1.1.2
+  flutter_launcher_icons: ^0.13.1
+  flutter_emoji_gif_picker: ^0.1.6
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+ 
+
+flutter_lints: ^1.0.0  # Use an appropriate version
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo.png"  # Vérifiez que le chemin est correct ici
+  web:
+    generate: true
+    image_path: "assets/images/logo.png"  # Vérifiez que le chemin est correct ici
+  windows:
+    generate: true
+    image_path: "assets/images/logo.png"  # Vérifiez que le chemin est correct ici
+  macos:
+    generate: true
+    image_path: "assets/images/logo.png"  # Vérifiez que le chemin est correct ici
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
+  # activated in the analysis_options.yaml file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0

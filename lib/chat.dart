@@ -16,6 +16,7 @@ class Chat extends StatefulWidget {
 class _ChatScreenState extends State<Chat> {
   final TextEditingController _controller = TextEditingController();
   String? chatID;
+  String? sourceEmail;
 
   @override
   void initState() {
@@ -25,14 +26,13 @@ class _ChatScreenState extends State<Chat> {
 
   void _initializeChat() async {
     User? currentUser = FirebaseAuth.instance.currentUser;
-    String? sourceEmail = currentUser?.email;
+    sourceEmail = currentUser?.email;
 
     if (sourceEmail != null) {
-      // Vérifier si une conversation existe déjà entre ces deux utilisateurs
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('conversations')
           .where('participants',
-              arrayContainsAny: [sourceEmail, "email"]).get();
+              arrayContainsAny: [sourceEmail, widget.userEmail]).get();
 
       bool conversationExists = false;
 
@@ -47,7 +47,6 @@ class _ChatScreenState extends State<Chat> {
       }
 
       if (!conversationExists) {
-        // Créer une nouvelle conversation
         DocumentReference newChatRef =
             await FirebaseFirestore.instance.collection('conversations').add({
           'participants': [sourceEmail, widget.userEmail],
@@ -68,7 +67,6 @@ class _ChatScreenState extends State<Chat> {
       String? sourceEmail = currentUser?.email;
 
       if (sourceEmail != null) {
-        // Sauvegarde du message dans la base de données
         await FirebaseFirestore.instance
             .collection('conversations')
             .doc(chatID)
@@ -79,9 +77,21 @@ class _ChatScreenState extends State<Chat> {
           'message': message,
           'timestamp': FieldValue.serverTimestamp(),
         });
+        _controller.clear();
       } else {
         print('Erreur : Impossible de récupérer l\'email de l\'utilisateur.');
       }
+    }
+  }
+
+  void _deleteMessage(DocumentSnapshot messageData) async {
+    if (chatID != null) {
+      await FirebaseFirestore.instance
+          .collection('conversations')
+          .doc(chatID)
+          .collection('messages')
+          .doc(messageData.id)
+          .delete();
     }
   }
 
@@ -89,17 +99,51 @@ class _ChatScreenState extends State<Chat> {
     Navigator.pop(context);
   }
 
+  Future<void> _confirmDeleteMessage(DocumentSnapshot messageData) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap a button
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmer la suppression'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Voulez-vous vraiment supprimer ce message ?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Annuler'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Supprimer'),
+              onPressed: () {
+                _deleteMessage(messageData);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.amber,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: _navigateBackToDiscussions,
+        ),
+        automaticallyImplyLeading: false,
         title: Text('Chat avec ${widget.userName}'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: _navigateBackToDiscussions,
-          ),
-        ],
       ),
       body: chatID == null
           ? Center(child: CircularProgressIndicator())
@@ -126,16 +170,51 @@ class _ChatScreenState extends State<Chat> {
                         return Center(child: Text('Aucun message'));
                       }
 
-                      var messages = snapshot.data!.docs
-                          .map((doc) => doc['message'] as String)
-                          .toList();
+                      var messages = snapshot.data!.docs;
 
                       return ListView.builder(
-                        reverse: true, // Start from bottom
+                        reverse: true,
                         itemCount: messages.length,
                         itemBuilder: (context, index) {
-                          return ListTile(
-                            title: Text(messages[index]),
+                          var messageData = messages[index];
+                          bool isSourceMessage =
+                              messageData['source'] == sourceEmail;
+
+                          return GestureDetector(
+                            onLongPress: () {
+                              if (isSourceMessage) {
+                                _confirmDeleteMessage(messageData);
+                              }
+                            },
+                            child: Align(
+                              alignment: isSourceMessage
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
+                              child: Container(
+                                margin: EdgeInsets.symmetric(
+                                  vertical: 4.0,
+                                  horizontal: 8.0,
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 10.0,
+                                  horizontal: 14.0,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isSourceMessage
+                                      ? Colors.orange.shade400
+                                      : Colors.grey[300],
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: Text(
+                                  messageData['message'],
+                                  style: TextStyle(
+                                    color: isSourceMessage
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
                           );
                         },
                       );
@@ -157,7 +236,7 @@ class _ChatScreenState extends State<Chat> {
                               _sendMessage(text);
                             },
                             decoration: InputDecoration.collapsed(
-                              hintText: 'Entre ton message..',
+                              hintText: 'Entre ton message...',
                             ),
                           ),
                         ),

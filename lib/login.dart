@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mychat/forgotpassword.dart';
-import 'package:mychat/singup.dart'; // Assurez-vous que c'est le bon chemin
+import 'package:mychat/singup.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -57,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               CircleAvatar(
                 radius: 50,
-                backgroundImage: AssetImage('assets/images/logo.png'),
+                backgroundImage: AssetImage('assets/images/logo2.jpg'),
               ),
               const SizedBox(height: 20),
               const Text(
@@ -66,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Colors.black,
                 ),
               ),
               const SizedBox(height: 20),

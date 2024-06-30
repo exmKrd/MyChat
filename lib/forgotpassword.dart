@@ -23,17 +23,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Future<void> _resetPassword() async {
     if (_formKey.currentState!.validate()) {
       try {
-        await FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text);
+        await FirebaseAuth.instance
+            .sendPasswordResetEmail(email: _emailController.text);
         // Display a success message to the user
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password reset email sent!')),
+          const SnackBar(content: Text('Email de rénitilisation envoyé !')),
         );
         // Optionally, navigate back to the login screen
         Navigator.pop(context);
       } on FirebaseAuthException catch (e) {
         // Handle errors (e.g., invalid email)
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message ?? 'Error sending reset email')),
+          SnackBar(content: Text(e.message ?? 'Erreur : email non envoyé')),
         );
       }
     }
@@ -43,7 +44,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Forgot Password'),
+        title: const Text('mot de passe envoyé'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -59,10 +60,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
+                    return 'Entrer votre email';
                   }
                   if (!value.contains('@')) {
-                    return 'Please enter a valid email';
+                    return 'Erreur : entrer un email valide';
                   }
                   return null;
                 },
@@ -70,7 +71,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _resetPassword,
-                child: const Text('Reset Password'),
+                child: const Text('Rénitialiser votre mot de passe'),
               ),
             ],
           ),

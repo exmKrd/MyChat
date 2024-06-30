@@ -1,60 +1,43 @@
 import 'dart:async';
-
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mychat/mychat.dart';
 import 'login.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/widgets.dart';
 import 'firebase_options.dart';
-var db = FirebaseFirestore.instance;
 
 void main() async {
-  
-  
-  // Initialize Firebase Core
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-  ); // Initialize Firebase Core
+  );
+
   runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
-  State<MyApp> createState() => _MyApp();
-
+  State<MyApp> createState() => _MyAppState();
 }
 
-class _MyApp extends State<MyApp>  {
-  late StreamSubscription _userAuthSubscription;
+class _MyAppState extends State<MyApp> {
+  late StreamSubscription<User?> _userAuthSubscription;
   bool userLoggedIn = false;
 
-
-@override
+  @override
   void initState() {
     super.initState();
-_userAuthSubscription =
+    _userAuthSubscription =
         FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      if (user == null) {
-        setState(() {
-          userLoggedIn = false;
-        });
-      } else {
-        setState(() {
-          userLoggedIn = true;
-        });
-
-        
-      }
+      setState(() {
+        userLoggedIn = user != null;
+      });
     });
-}
+  }
 
-@override
+  @override
   void dispose() {
     _userAuthSubscription.cancel();
     super.dispose();
@@ -64,13 +47,9 @@ _userAuthSubscription =
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MyChat',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Color.fromARGB(255, 243, 164, 60),
-        ),
-        useMaterial3: true,
-      ),
-      home: userLoggedIn ? const MyChat() : const LoginScreen()
+      theme: ThemeData.light().copyWith(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange.shade400)),
+      home: userLoggedIn ? const MyChat() : const LoginScreen(),
     );
   }
 }
