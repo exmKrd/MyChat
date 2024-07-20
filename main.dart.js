@@ -98460,7 +98460,7 @@ $S:19}
 A.atq.prototype={
 $1(a){var s=null,r=this.a,q=r.c.a9(t.O)
 q.toString
-q.f.eA(A.en(s,s,s,s,s,B.q,s,A.a7("Le contact a \xe9t\xe9 supprim\xe9 des deux c\xf4t\xe9s.",s,s,s,s,s,s),s,A.bY(0,0,0,2),s,s,s,s,s,s,s,s,s))
+q.f.eA(A.en(s,s,s,s,s,B.q,s,A.a7("Le contact a \xe9t\xe9 supprim\xe9.",s,s,s,s,s,s),s,A.bY(0,0,0,2),s,s,s,s,s,s,s,s,s))
 r=r.c
 r.toString
 A.bv(r,!1).cm()},
