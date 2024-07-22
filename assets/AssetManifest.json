@@ -1,1 +1,17 @@
-{"assets/images/.DS_Store":["assets/images/.DS_Store"],"assets/images/logo.png":["assets/images/logo.png"],"assets/images/logo2.png":["assets/images/logo2.png"],"assets/images/pdp.jpeg":["assets/images/pdp.jpeg"]}
+{
+    "assets/images/.DS_Store": [
+        "assets/images/.DS_Store"
+    ],
+    "assets/images/logo.png": [
+        "assets/images/logo.png"
+    ],
+    "assets/images/logo2.png": [
+        "assets/images/logo2.png"
+    ],
+    "assets/images/pdp.jpeg": [
+        "assets/images/pdp.jpeg"
+    ],
+    "packages/giphy_picker/assets/PoweredBy_200px-Black_HorizText.png": [
+        "packages/giphy_picker/assets/PoweredBy_200px-Black_HorizText.png"
+    ]
+}
